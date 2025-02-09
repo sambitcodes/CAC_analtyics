@@ -9,8 +9,10 @@ from sklearn.metrics import mean_squared_error, r2_score
 from scipy.stats import skew, kurtosis
 import plotly.express as px
 import plotly.figure_factory as ff
+from streamlit_extras.switch_page_button import switch_page
+from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title = "CAClysis",page_icon="🦈",layout="wide")
+st.set_page_config(page_title = "CAClysis",page_icon="🦈",layout="wide",initial_sidebar_state="collapsed")
 
 # Load the dataset
 costs_data = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
@@ -44,7 +46,6 @@ categorical_df = pd.DataFrame({"Features": categorical_features, "Count of each 
 
 
 
-
 # st.metric(label="Temperature", value="70 °F", delta="1.2 °F")
 with st.container(border=True):
     left,right = st.columns(2, vertical_alignment="center")
@@ -53,7 +54,22 @@ with st.container(border=True):
     left.markdown("#### Detailed EDA on Customer Acquistion Costs (FOOD-MART)")
     # left.subheader("Detailed EDA on Customer Acquistion Costs (FOOD-MART)")
 
-
+with st.container():
+    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Train", "Prediction"],
+                                icons=['house', "graph-up-arrow","cloud-upload","signal"],menu_icon="cast",
+                                default_index=0,orientation="horizontal",styles={"nav-link":
+                                                                                  {"text-align": "left","--hover-color": "#eee",}
+                                                                                  ,"nav-link-selected": 
+                                                                                  {"background-color": "green"}})
+    # # if selected == "Home":
+        # # st.switch_page("main.py")
+    if selected == "EDA":
+        st.switch_page(r"pages/eda.py")
+    if selected == "Train":
+        st.switch_page(r"pages/train.py")
+    if selected == "Prediction":
+        st.switch_page(r"pages/prediction.py")
+        
 with st.container(border=True):
     if "disabled" not in st.session_state:
         st.session_state.disabled = False
@@ -202,11 +218,5 @@ with st.container(border=True):
 
         
 
-# 1. Histogram for Customer Income Distribution
-# sns.histplot(cac_data['avg. yearly_income'], kde=False, color="skyblue", ax=axes[0, 0])
-# axes[0, 0].set_title('Income Distribution of Customers', fontsize=14)
-# axes[0, 0].set_xlabel('Income (USD)', fontsize=12)
-# axes[0, 0].set_ylabel('Frequency', fontsize=12)
-# axes[0, 0].tick_params(axis='x', rotation=30)
-# for i in axes[0,0].containers:
-#     axes[0,0].bar_label(i, label_type = 'edge', fontsize = 10)  # Rotate x labels for better readability
+
+        
