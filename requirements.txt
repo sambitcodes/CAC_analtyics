@@ -6,15 +6,8 @@ seaborn
 jupyter
 tensorflow
 keras
-torch
-torchvision
-torchaudio
-transformers
-nltk
 spacy
 gensim
-opencv-python
-Pillow
 scipy
 xgboost
 lightgbm
