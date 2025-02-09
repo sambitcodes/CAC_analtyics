@@ -13,7 +13,7 @@ import plotly.figure_factory as ff
 st.set_page_config(page_title = "CAClysis",page_icon="🦈",layout="wide")
 
 # Load the dataset
-costs_data = pd.read_csv('cac_dataset\customer_acquisition_costs.csv')
+costs_data = pd.read_csv(r'cac_dataset\customer_acquisition_costs.csv')
 costs_data = costs_data.rename(columns={'avg. yearly_income': 'yearly_income'})
 costs_data = costs_data.drop(["avg_cars_at home(approx).1"], axis=1)
 costs_columns = list(costs_data.columns)
@@ -48,7 +48,7 @@ categorical_df = pd.DataFrame({"Features": categorical_features, "Count of each 
 # st.metric(label="Temperature", value="70 °F", delta="1.2 °F")
 with st.container(border=True):
     left,right = st.columns(2, vertical_alignment="center")
-    right.image("elements\pictures\cfm_logo.gif",use_container_width=True)
+    right.image(r"elements\pictures\cfm_logo.gif",use_container_width=True)
     left.title(":blue[_CAC_] Analysis :chart:")
     left.markdown("#### Detailed EDA on Customer Acquistion Costs (FOOD-MART)")
     # left.subheader("Detailed EDA on Customer Acquistion Costs (FOOD-MART)")
