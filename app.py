@@ -213,10 +213,18 @@ with st.container(border=True):
         
         # option_color = st.radio("Select a category for fun hue.",)
         with st.container(border=True):
-            st.bar_chart(costs_data, x=option_cat, y=option_num,color=option_color,stack=False,use_container_width=True)
+            st.bar_chart(costs_data, x=option_cat, y=option_num,color=option_color,stack=False,horizontal=True,use_container_width=True)
 
 
-        #add heatmap
+#         #add heatmap
+# with st.container(border=True):
+#     if "disabled_five" not in st.session_state:
+#         st.session_state.disabled_five = False
+
+#     st.checkbox("Select the box to display heatmap", key="disabled_five")
+#     if st.session_state.disabled_five:
+#         correlation_matrix = costs_data
+
 
 
         
