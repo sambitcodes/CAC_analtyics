@@ -24,3 +24,8 @@ h5py
 joblib
 dill
 requests
+addfips
+plotly-geo
+geopandas
+pyshp
+shapely
