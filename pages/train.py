@@ -151,11 +151,11 @@ with st.container(border=True):
                     st.dataframe(pd.DataFrame({"Inference" : ["The 'avg_cars_at home(approx).1' is a complete duplicate of 'avg_cars_at home(approx)'"]}), width=1400, height=50, hide_index=True)
                 
                 with right_rep:  
-                    st.button("Remove repeating column", key="rem_repeat", use_container_width=True) #Created button to view description of data
+                    st.button("Remove", key="rem_repeat", use_container_width=True) #Created button to view description of data
                     if st.session_state.rem_repeat:
-                        with st.spinner("Wait for it...", show_time=True):
+                        with st.spinner("Removing...", show_time=True):
                             time.sleep(2)
-                        st.success("Removed!")
+                        st.success("Removed!!!")
                         st.dataframe(costs_data.iloc[:10, 12:20].style.set_properties(subset=["avg_cars_at home(approx)"], **{'background-color': 'blue'}),
                                     width=1400,
                                     height=200,
@@ -176,11 +176,11 @@ with st.container(border=True):
                                   width=1400, height=100, hide_index=True)
                 
                 with right_rep:  
-                    st.button("Clean up !", key="clean_col", use_container_width=True) #Created button to view description of data
+                    st.button("Clean", key="clean_col", use_container_width=True) #Created button to view description of data
                     if st.session_state.clean_col:
                         with st.spinner("Cleaning...", show_time=True):
                             time.sleep(2)
-                        st.success("Cleaning done!")
+                        st.success("Cleaning done!!!")
 
                         left, right = st.columns(2)
                         left.dataframe(cleaned_year_inc,width=1400,height=200,hide_index=True) 
@@ -233,11 +233,11 @@ with st.container(border=True):
                     st.dataframe(pd.DataFrame({"Inference" : ["The 'education' column has 5 categories", "The order of categories are preserved as 'partial high school' is mapped with value 0 while 'Graduate degree' with value 4"]}),
                                    height=100, hide_index=True, use_container_width=True)
                 with right:
-                    st.button("encode !", key="clean_col", use_container_width=True) #Created button to view description of data
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
                     if st.session_state.clean_col:
                         with st.spinner("Encoding...", show_time=True):
                             time.sleep(2)
-                        st.success("Cleaning done!")
+                        st.success("Encoded!")
                         st.dataframe(ed_encoded.iloc[:10,9:14].style.set_properties(subset=["education"], **{'background-color': 'blue'}),
                                      width=1400, height=200, hide_index=True)
             
@@ -253,11 +253,11 @@ with st.container(border=True):
                     st.dataframe(pd.DataFrame({"Inference" : ["The 'occupation' column has 5 categories", "The order of categories are preserved as 'manual' is mapped with value 0 while 'management' with value 4"]}),
                                    height=100, hide_index=True, use_container_width=True)
                 with right:
-                    st.button("encode !", key="clean_col", use_container_width=True) #Created button to view description of data
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
                     if st.session_state.clean_col:
                         with st.spinner("Encoding...", show_time=True):
                             time.sleep(2)
-                        st.success("Cleaning done!")
+                        st.success("Encoded!!!")
                         st.dataframe(occ_encoded.iloc[:10,10:15].style.set_properties(subset=["occupation"], **{'background-color': 'blue'}),
                                      width=1400, height=200, hide_index=True)    
                         
@@ -274,11 +274,11 @@ with st.container(border=True):
                     st.dataframe(pd.DataFrame({"Inference" : ["The 'member-card' column has 4 categories", "The order of categories are preserved as 'normal' is mapped with value 0 while 'golden' with value 3"]}),
                                    height=100, hide_index=True, use_container_width=True)
                 with right:
-                    st.button("encode !", key="clean_col", use_container_width=True) #Created button to view description of data
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
                     if st.session_state.clean_col:
                         with st.spinner("Encoding...", show_time=True):
                             time.sleep(2)
-                        st.success("Cleaning done!")
+                        st.success("Encoded!!!")
                         st.dataframe(mem_encoded.iloc[:10,10:15].style.set_properties(subset=["member_card"], **{'background-color': 'blue'}),
                                      width=1400, height=200, hide_index=True)    
         
@@ -294,11 +294,11 @@ with st.container(border=True):
                     st.dataframe(pd.DataFrame({"Inference" : ["The 'yearly_income' column has 8 categories", "The order of categories are preserved as '10k-30k' is mapped with value 0 while '150k+' with value 7"]}),
                                    height=100, hide_index=True, use_container_width=True)
                 with right:
-                    st.button("encode !", key="clean_col", use_container_width=True) #Created button to view description of data
+                    st.button("Encode ", key="clean_col", use_container_width=True) #Created button to view description of data
                     if st.session_state.clean_col:
                         with st.spinner("Encoding...", show_time=True):
                             time.sleep(2)
-                        st.success("Cleaning done!")
+                        st.success("Encoded!!!")
                         st.dataframe(inc_encoded.iloc[:10,14:19].style.set_properties(subset=["avg. yearly_income"], **{'background-color': 'blue'}),
                                      width=1400, height=200, hide_index=True)  
                         
@@ -315,11 +315,11 @@ with st.container(border=True):
                     st.dataframe(pd.DataFrame({"Inference" : ["The 'store_type' column has 5 categories", "The order of categories are preserved as '' is mapped with value 0 while '150k+' with value 7"]}),
                                    height=100, hide_index=True, use_container_width=True)
                 with right:
-                    st.button("encode !", key="clean_col", use_container_width=True) #Created button to view description of data
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
                     if st.session_state.clean_col:
                         with st.spinner("Encoding...", show_time=True):
                             time.sleep(2)
-                        st.success("Cleaning done!")
+                        st.success("Encoded!!!")
                         st.dataframe(store_encoded.iloc[:10,23:28].style.set_properties(subset=["store_type"], **{'background-color': 'blue'}),
                                      width=1400, height=200, hide_index=True)  
 
