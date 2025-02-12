@@ -689,14 +689,15 @@ with st.container(border=True):
     if "disabled_fourteen" not in st.session_state:
         st.session_state.disabled_fourteen = False
 
-    st.checkbox(":blue[_Exploration 14_] || Costs of acquiring customers using member-cards", key="disabled_fourteen")
+    st.checkbox(":blue[_Exploration 14_] || Costs of acquiring customers using member-cards per unit sale.", key="disabled_fourteen")
     if st.session_state.disabled_fourteen:
         feat = "member_card"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
         feature_data = costs_data.groupby(feat)
-        cost_by_feat = feature_data["cost"].mean().reset_index().sort_values(by="cost",ascending=False)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
         st.dataframe(cost_by_feat.T, use_container_width=True)
-        title_s = "Mean cost of aqcquiring customer vs {}".format(feat)
-        fig = px.bar(cost_by_feat, x = feat, y = "cost",title = title_s)
+        title_s = "Mean cost  of acquiring customer per unit sale using {}".format(feat)
+        fig = px.bar(cost_by_feat, x = feat, y = "cac_unit",title = title_s)
         fig.update_traces(marker_color='red')
         # fig.update_traces(line_color='violet', line_width=2)
         st.plotly_chart(fig)
@@ -708,18 +709,218 @@ with st.container(border=True):
     st.checkbox(":blue[_Exploration 15_] || Costs of acquiring customers using promotions", key="disabled_15")
     if st.session_state.disabled_15:
         feat = "promotion_name"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
         feature_data = costs_data.groupby(feat)
-        cost_by_feat = feature_data["cost"].mean().reset_index().sort_values(by="cost",ascending=False)
-        cost_by_feat2 = feature_data["cost"].mean().reset_index().sort_values(by="cost",ascending=True)[:5]
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
         st.dataframe(cost_by_feat.T, use_container_width=True)
-        title_s = "Mean cost of aqcquiring costs vs {}".format(feat)
-        fig = px.line(cost_by_feat, x = feat, y = "cost",title = title_s, markers=True)
+        title_s = "Mean cost of acquiring customer per unit sale using {}".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit",title = title_s, markers=True)
         fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
         st.plotly_chart(fig)
 
-        title_t = "5 {} with lowest cost of acquiring customer".format(feat)
-        fig = px.bar(cost_by_feat2, x = feat, y = "cost",title = title_t)
+        title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit",title = title_t)
         fig.update_traces(marker_color='blue')
-        
         st.plotly_chart(fig)
         
+
+with st.container(border=True):
+    if "disabled_16" not in st.session_state:
+        st.session_state.disabled_16 = False
+
+    st.checkbox(":blue[_Exploration 16_] || Costs of acquiring customers for unit sold of food_categories", key="disabled_16")
+    if st.session_state.disabled_16:
+        feat = "food_category"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        fig.update_traces(marker_color='blue')
+        st.plotly_chart(fig)
+        
+
+with st.container(border=True):
+    if "disabled_17" not in st.session_state:
+        st.session_state.disabled_17 = False
+
+    st.checkbox(":blue[_Exploration 17_] || Costs of acquiring customers for unit sold in a country", key="disabled_17")
+    if st.session_state.disabled_17:
+        feat = "sales_country"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        # title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        # fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        # fig.update_traces(marker_color='blue')
+        # st.plotly_chart(fig)
+
+
+with st.container(border=True):
+    if "disabled_18" not in st.session_state:
+        st.session_state.disabled_18 = False
+
+    st.checkbox(":blue[_Exploration 18_] || Costs of acquiring customers for unit sold based on gender/marital status/no. of children", key="disabled_18")
+    if st.session_state.disabled_18:
+        base_features = ["gender","marital_status","num_children_at_home"]
+        feat = st.selectbox("Select one of the following feature.",base_features,key="feat")
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        # title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        # fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        # fig.update_traces(marker_color='blue')
+        # st.plotly_chart(fig)
+
+with st.container(border=True):
+    if "disabled_19" not in st.session_state:
+        st.session_state.disabled_19 = False
+
+    st.checkbox(":blue[_Exploration 19_] || Costs of acquiring customers for unit sold based on education/occupation", key="disabled_19")
+    if st.session_state.disabled_19:
+        base_features = ["education","occupation"]
+        feat = st.selectbox("Select one of the following feature.",base_features,key="feat")
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+with st.container(border=True):
+    if "disabled_20" not in st.session_state:
+        st.session_state.disabled_20 = False
+
+    st.checkbox(":blue[_Exploration 20_] || Costs of acquiring customers for unit sold based on assets", key="disabled_20")
+    if st.session_state.disabled_20:
+        base_features = ["houseowner","avg_cars_at home(approx)"]
+        feat = st.selectbox("Select one of the following feature.",base_features,key="feat")
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+with st.container(border=True):
+    if "disabled_21" not in st.session_state:
+        st.session_state.disabled_21 = False
+
+    st.checkbox(":blue[_Exploration 21_] || Costs of acquiring customers for unit sold based on income bracket", key="disabled_21")
+    if st.session_state.disabled_21:
+        # base_features = ["gender","marital_status","num_children_at_home"]
+        feat = "yearly_income"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        # title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        # fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        # fig.update_traces(marker_color='blue')
+        # st.plotly_chart(fig)
+
+
+with st.container(border=True):
+    if "disabled_22" not in st.session_state:
+        st.session_state.disabled_22 = False
+
+    st.checkbox(":blue[_Exploration 22_] || Costs of acquiring customers for unit sold of a brand.", key="disabled_22")
+    if st.session_state.disabled_22:
+        # base_features = ["gender","marital_status","num_children_at_home"]
+        feat = "brand_name"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        fig.update_traces(marker_color='blue')
+        st.plotly_chart(fig)
+
+with st.container(border=True):
+    if "disabled_23" not in st.session_state:
+        st.session_state.disabled_23 = False
+
+    st.checkbox(":blue[_Exploration 23_] || Costs of acquiring customers for unit sold through media ads", key="disabled_23")
+    if st.session_state.disabled_23:
+        # base_features = ["gender","marital_status","num_children_at_home"]
+        feat = "media_type"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        fig.update_traces(marker_color='blue')
+        st.plotly_chart(fig)
+
+with st.container(border=True):
+    if "disabled_24" not in st.session_state:
+        st.session_state.disabled_24 = False
+
+    st.checkbox(":blue[_Exploration 24_] || Costs of acquiring customers for unit sold in type of store", key="disabled_24")
+    if st.session_state.disabled_24:
+        # base_features = ["gender","marital_status","num_children_at_home"]
+        feat = "store_type"
+        costs_data["cac_unit"] = costs_data['cost']/costs_data['unit_sales(in millions)']
+        feature_data = costs_data.groupby(feat)
+        cost_by_feat = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=False)
+        cost_by_feat2 = feature_data["cac_unit"].mean().reset_index().sort_values(by="cac_unit",ascending=True)[:5]
+        st.dataframe(cost_by_feat.T, use_container_width=True)
+        title_s = "Mean cost of acquiring customer for unit {} sold".format(feat)
+        fig = px.line(cost_by_feat, x = feat, y = "cac_unit", title = title_s, markers=True)
+        fig.update_traces(line_color='red', line_width=2, marker_color = 'yellow')
+        st.plotly_chart(fig)
+
+        title_t = "5 {} with lowest cost of acquiring customer per unit sold".format(feat)
+        fig = px.bar(cost_by_feat2, x = feat, y = "cac_unit", title = title_t)
+        fig.update_traces(marker_color='blue')
+        st.plotly_chart(fig)
+
+
