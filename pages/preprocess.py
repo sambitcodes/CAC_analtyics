@@ -70,6 +70,53 @@ dic_2 = {}
 for i in range(len(nominal_cat)):
     dic_2[nominal_cat[i]] = store_encoded[nominal_cat[i]].unique()
 
+food_cat_map = pd.DataFrame({nominal_cat[0] : dic_2[nominal_cat[0]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[0]]))]})
+food_cat_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[0]]).fit_transform(store_encoded)
+
+food_dept_map = pd.DataFrame({nominal_cat[1] : dic_2[nominal_cat[1]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[1]]))]})
+food_dept_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[1]]).fit_transform(food_cat_encoded)
+
+food_fam_map = pd.DataFrame({nominal_cat[2] : dic_2[nominal_cat[2]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[2]]))]})
+food_fam_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[2]]).fit_transform(food_dept_encoded)
+
+promotion_map = pd.DataFrame({nominal_cat[3] : dic_2[nominal_cat[3]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[3]]))]})
+promotion_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[3]]).fit_transform(food_fam_encoded)
+
+country_map = pd.DataFrame({nominal_cat[4] : dic_2[nominal_cat[4]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[4]]))]})
+country_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[4]]).fit_transform(promotion_encoded)
+
+marital_map = pd.DataFrame({nominal_cat[5] : dic_2[nominal_cat[5]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[5]]))]})
+marital_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[5]]).fit_transform(country_encoded)
+
+gender_map = pd.DataFrame({nominal_cat[6] : dic_2[nominal_cat[6]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[6]]))]})
+gender_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[6]]).fit_transform(marital_encoded)
+
+house_map = pd.DataFrame({nominal_cat[7] : dic_2[nominal_cat[7]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[7]]))]})
+house_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[7]]).fit_transform(gender_encoded)
+
+brand_map = pd.DataFrame({nominal_cat[8] : dic_2[nominal_cat[8]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[8]]))]})
+brand_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[8]]).fit_transform(house_encoded)
+
+city_map = pd.DataFrame({nominal_cat[9] : dic_2[nominal_cat[9]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[9]]))]})
+city_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[9]]).fit_transform(brand_encoded)
+
+state_map = pd.DataFrame({nominal_cat[10] : dic_2[nominal_cat[10]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[10]]))]})
+state_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[10]]).fit_transform(city_encoded)
+
+media_map = pd.DataFrame({nominal_cat[11] : dic_2[nominal_cat[11]],
+                             "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[11]]))]})
+media_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[11]]).fit_transform(state_encoded)
 
 
 
@@ -381,8 +428,8 @@ with st.container(border=True):
             if st.session_state.disabled3_2:
                 left, right = st.columns(2)
                 with left:
-                    st.dataframe(ed_map, use_container_width=True, hide_index=True)
-                    st.dataframe(pd.DataFrame({"Inference" : ["The 'education' column has 5 categories", "The order of categories are preserved as 'partial high school' is mapped with value 0 while 'Graduate degree' with value 4"]}),
+                    st.dataframe(food_cat_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'food_category' column has 45 categories", "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
                                    height=100, hide_index=True, use_container_width=True)
                 with right:
                     st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
@@ -390,8 +437,238 @@ with st.container(border=True):
                         with st.spinner("Encoding...", show_time=True):
                             time.sleep(2)
                         st.success("Encoded!")
-                    
-                
-                    
-                
+                        st.dataframe(food_cat_encoded.iloc[:10,:8].style.set_properties(subset=['food_category_0', 'food_category_1', 'food_category_2',
+       'food_category_3', 'food_category_4', 'food_category_5'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                        
         
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_3" not in st.session_state:
+                st.session_state.disabled3_3 = False
+
+            st.checkbox("Encode the 'food_department' column !", key="disabled3_3")
+            if st.session_state.disabled3_3:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(food_dept_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'food_department' column has 22 categories", "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(food_dept_encoded.iloc[:10,5:12].style.set_properties(subset=['food_department_0', 'food_department_1', 'food_department_2',
+       'food_department_3', 'food_department_4'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                        
+        
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_4" not in st.session_state:
+                st.session_state.disabled3_4 = False
+
+            st.checkbox("Encode the 'food_family' column !", key="disabled3_4")
+            if st.session_state.disabled3_4:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(food_fam_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'food_family' column has 3 categories", "Binary encoding or One hot encoding will work just fine"]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(food_fam_encoded.iloc[:10,10:15].style.set_properties(subset=['food_family_0',
+       'food_family_1'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                
+
+        
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_5" not in st.session_state:
+                st.session_state.disabled3_5 = False
+
+            st.checkbox("Encode the 'promotion_name' column !", key="disabled3_5")
+            if st.session_state.disabled3_5:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(promotion_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'promotion_name' column has 49 categories", "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(promotion_encoded.iloc[:10,15:23].style.set_properties(subset=['promotion_name_0','promotion_name_1',
+       'promotion_name_2', 'promotion_name_3', 'promotion_name_4',
+       'promotion_name_5'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+        
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_6" not in st.session_state:
+                st.session_state.disabled3_6 = False
+
+            st.checkbox("Encode the 'sales_country' column !", key="disabled3_6")
+            if st.session_state.disabled3_6:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(country_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'sales_country' column has 3 categories", "Binary encoding or One hot encoding will work just fine"]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(country_encoded.iloc[:10,21:25].style.set_properties(subset=['sales_country_0', 'sales_country_1'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                    
+                
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_7" not in st.session_state:
+                st.session_state.disabled3_7 = False
+
+            st.checkbox("Encode the 'marital_status' column !", key="disabled3_7")
+            if st.session_state.disabled3_7:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(marital_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'marital_status' column has 2 categories", "Binary encoding or One hot encoding will work just fine"]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(marital_encoded.iloc[:10,23:27].style.set_properties(subset=['marital_status_0', 'marital_status_1'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+        
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_8" not in st.session_state:
+                st.session_state.disabled3_8 = False
+
+            st.checkbox("Encode the 'gender' column !", key="disabled3_8")
+            if st.session_state.disabled3_8:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(gender_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'gender' column has 2 categories", "Binary encoding or One hot encoding will work just fine"]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(gender_encoded.iloc[:10,25:29].style.set_properties(subset=['gender_0', 'gender_1'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                    
+        
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_9" not in st.session_state:
+                st.session_state.disabled3_9 = False
+
+            st.checkbox("Encode the 'houseowner' column !", key="disabled3_9")
+            if st.session_state.disabled3_9:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(house_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'houseowner' column has 2 categories", "Binary encoding or One hot encoding will work just fine"]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(house_encoded.iloc[:10,31:35].style.set_properties(subset=['houseowner_0', 'houseowner_1'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+        
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_10" not in st.session_state:
+                st.session_state.disabled3_10 = False
+
+            st.checkbox("Encode the 'brand_name' column !", key="disabled3_10")
+            if st.session_state.disabled3_10:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(brand_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'brand_name' column has 111 categories",  "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(brand_encoded.iloc[:10,36:45].style.set_properties(subset=['brand_name_0',
+       'brand_name_1', 'brand_name_2', 'brand_name_3', 'brand_name_4',
+       'brand_name_5', 'brand_name_6'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                        
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_11" not in st.session_state:
+                st.session_state.disabled3_11 = False
+
+            st.checkbox("Encode the 'store_city' column !", key="disabled3_11")
+            if st.session_state.disabled3_11:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(city_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'store_city' column has 19 categories",  "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(city_encoded.iloc[:10,50:57].style.set_properties(subset=['store_city_0', 'store_city_1', 'store_city_2', 'store_city_3',
+       'store_city_4'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                        
+                        
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_12" not in st.session_state:
+                st.session_state.disabled3_12 = False
+
+            st.checkbox("Encode the 'store_state' column !", key="disabled3_12")
+            if st.session_state.disabled3_12:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(state_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'store_state' column has 10 categories",  "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(state_encoded.iloc[:10,55:61].style.set_properties(subset=['store_state_0', 'store_state_1', 'store_state_2',
+       'store_state_3'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                        
+        
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_13" not in st.session_state:
+                st.session_state.disabled3_13 = False
+
+            st.checkbox("Encode the 'media_type' column !", key="disabled3_13")
+            if st.session_state.disabled3_13:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(media_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'media_type' column has 9 categories",  "Binary encoding will be a great option at it preserves the categorical nature without increasing the number of columns by a lot."]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
+                        st.dataframe(media_encoded.iloc[:10,68:].style.set_properties(subset=['media_type_0', 'media_type_1', 'media_type_2',
+       'media_type_3'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                    
