@@ -118,6 +118,45 @@ media_map = pd.DataFrame({nominal_cat[11] : dic_2[nominal_cat[11]],
                              "encoding_values" : [bin(n)[2:] for n in range(len(dic_2[nominal_cat[11]]))]})
 media_encoded = cat_encoder.BinaryEncoder(cols= [nominal_cat[11]]).fit_transform(state_encoded)
 
+def get_stats(data,col):
+    data_column = data[col]
+    op_mean = np.mean(data_column)
+    op_median = np.median(data_column)
+    op_std = np.std(data_column)
+    op_var = np.var(data_column)
+    op_min = np.min(data_column)
+    op_max = np.max(data_column)
+    op_1q = data_column.quantile(0.25)
+    op_3q = data_column.quantile(0.75)
+    op_iqr = op_3q - op_1q
+    op_upper = min((op_3q + 1.5*(op_iqr)),data_column.max())
+    op_lower = max((op_1q - 1.5*(op_iqr)),data_column.min())
+    op_outliers = ((data_column < op_lower) | (data_column > op_upper)).sum()
+    dic_stats = {"Mean": [op_mean],
+                "Median":[op_median],
+                "Standard-Deviation": [op_std],
+                "Variance": [op_var],
+                "Minimum Value": [op_min],
+                "Maximum Value": [op_max],
+                "Q1": [op_1q],
+                "Q3": [op_3q],
+                "IQR": [op_iqr],
+                "Upper Fence":[op_upper],
+                "Lower Fence": [op_lower],
+                "Outliers count":[op_outliers]}
+
+    return dic_stats
+
+
+dic_sales = get_stats(media_encoded, "store_sales(in millions)") 
+sales_outlier = media_encoded.copy()
+sales_outlier["store_sales(in millions)"] = np.where(media_encoded["store_sales(in millions)"] > dic_sales["Upper Fence"][0], dic_sales["Upper Fence"][0], (np.where(media_encoded["store_sales(in millions)"] < dic_sales["Lower Fence"][0], dic_sales["Lower Fence"][0], media_encoded["store_sales(in millions)"])))
+dic_sales2 = get_stats(sales_outlier,"store_sales(in millions)")
+
+dic_cost = get_stats(media_encoded, "store_cost(in millions)") 
+cost_outlier = sales_outlier.copy()
+cost_outlier["store_cost(in millions)"] = np.where(cost_outlier["store_cost(in millions)"] > dic_cost["Upper Fence"][0], dic_cost["Upper Fence"][0], (np.where(cost_outlier["store_cost(in millions)"] < dic_cost["Lower Fence"][0], dic_cost["Lower Fence"][0], cost_outlier["store_cost(in millions)"])))
+dic_cost2 = get_stats(cost_outlier,"store_cost(in millions)")
 
 
 #float-type features
@@ -671,4 +710,59 @@ with st.container(border=True):
                         st.success("Encoded!")
                         st.dataframe(media_encoded.iloc[:10,68:].style.set_properties(subset=['media_type_0', 'media_type_1', 'media_type_2',
        'media_type_3'], **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
-                    
+
+
+with st.container(border=True):
+    if "disabled4" not in st.session_state:
+        st.session_state.disabled4 = False
+
+    st.checkbox("Handling Outliers", key="disabled4")
+    if st.session_state.disabled4: 
+        st.dataframe(media_encoded.iloc[:10, 9:18].style.set_properties(subset=["store_sales(in millions)","store_cost(in millions)"], **{'background-color': 'blue'}), width=1400, height=150)
+        
+        with st.container(border=True): ### Extract ordinal
+            if "disabled4_1" not in st.session_state:
+                st.session_state.disabled4_1 = False
+
+            st.checkbox("Remove outliers from 'stores_sales' column !", key="disabled4_1")
+            if st.session_state.disabled4_1:
+                left, right = st.columns(2)
+
+                with left:
+                    st.dataframe(pd.DataFrame(dic_sales), use_container_width=True,hide_index=True)
+                    fig_with_out = px.box(media_encoded["store_sales(in millions)"], orientation='h')
+                    st.plotly_chart(fig_with_out)
+
+                with right:
+                    st.button("Remove outlier", key="rem_sale", use_container_width=True) #Created button to view description of data
+                    if st.session_state.rem_sale:
+                        with st.spinner("Removing...", show_time=True):
+                            time.sleep(2)
+                        st.success("Removed!")
+                        st.dataframe(pd.DataFrame(dic_sales2), use_container_width=True,hide_index=True)
+                        fig_without_out = px.box(sales_outlier["store_sales(in millions)"], orientation='h')
+                        st.plotly_chart(fig_without_out)
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled4_2" not in st.session_state:
+                st.session_state.disabled4_2 = False
+
+            st.checkbox("Remove outliers from 'stores_cost' column !", key="disabled4_2")
+            if st.session_state.disabled4_2:
+                left, right = st.columns(2)
+
+                with left:
+                    st.dataframe(pd.DataFrame(dic_cost), use_container_width=True,hide_index=True)
+                    fig_with_out = px.box(media_encoded["store_cost(in millions)"], orientation='h')
+                    st.plotly_chart(fig_with_out)
+
+                with right:
+                    st.button("Remove outlier", key="rem_cost", use_container_width=True) #Created button to view description of data
+                    if st.session_state.rem_cost:
+                        with st.spinner("Removing...", show_time=True):
+                            time.sleep(2)
+                        st.success("Removed!")
+                        st.dataframe(pd.DataFrame(dic_cost2), use_container_width=True,hide_index=True)
+                        fig_without_out = px.box(cost_outlier["store_cost(in millions)"], orientation='h')
+                        st.plotly_chart(fig_without_out,key="cost_without_outliers")
+        
