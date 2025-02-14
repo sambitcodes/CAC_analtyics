@@ -18,7 +18,8 @@ st.set_page_config(page_title = "Preprocess",page_icon="🦈",layout="wide",init
 
 # Load the dataset
 costs_data = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
-train_data = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
+train = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
+train_data = train.drop(["cost"],axis=1)
 repeat_data = train_data.drop(["avg_cars_at home(approx).1"], axis=1) # removed reptitive
 year_inc = pd.DataFrame({'avg. yearly_income':repeat_data['avg. yearly_income'].unique()})
 cleaned_year_inc =  year_inc['avg. yearly_income'].str.replace(r'\$', '', regex=True).unique()
@@ -34,12 +35,71 @@ costs_columns = list(costs_data.columns)
 cleaned_data = train_data.drop(["avg_cars_at home(approx).1"], axis=1)
 cleaned_data["avg. yearly_income"] = cleaned_data['avg. yearly_income'].str.replace(r'\$', '', regex=True) #cleaned yearly income
 cleaned_data["media_type"] = cleaned_data["media_type"].apply(media_cleaner) #cleaned mediatype 
+cleaned_data2 = cleaned_data.copy()
+
+education_mapping = {
+    "Partial High School": 1,
+    "High School Degree": 2,
+    "Partial College": 3,
+    "Bachelors Degree": 4,
+    "Graduate Degree": 5
+}
+
+houseowner_mapping = {"Y": 1, "N": 0}
+
+occupation_mapping = {'Manual' :1,
+                    'Skilled Manual':2,
+                    'Clerical':3,
+                    'Professional':4,
+                    'Management':5}
+
+member_card_mapping = {
+    "Normal": 1,
+    "Bronze": 2,
+    "Silver": 3,
+    "Golden": 4
+}
+income_mapping = {
+    "10K - 30K": 1,
+    "30K - 50K": 2,
+    "50K - 70K": 3,
+    "70K - 90K": 4,
+    "90K - 110K": 5,
+    "110K - 130K": 6,
+    "130K - 150K": 7,
+    "150K +": 8
+}
+car_mapping = {
+    "0 car": 0.0,
+    "1 car": 1.0,
+    "2 car": 2.0,
+    "3 car": 3.0,
+    "4 car": 4.0
+}
+
+weights = {
+    "education_encoded": 0.1,
+    "houseowner_encoded": 0.15,
+    "member_card_encoded": 0.2,
+    "income_encoded": 0.3, 
+    "occupation_encoded": 0.1,
+    "cars_at_home" : 0.15
+}
+
+cleaned_data2["profile_strength"] = (
+    (cleaned_data2["education"].map(education_mapping)) * weights["education_encoded"] +
+    (cleaned_data2["houseowner"].map(houseowner_mapping)) * weights["houseowner_encoded"] +
+    (cleaned_data2["member_card"].map(member_card_mapping)) * weights["member_card_encoded"] +
+    (cleaned_data2["avg. yearly_income"].map(income_mapping)) * weights["income_encoded"] +
+    (cleaned_data2["occupation"].map(occupation_mapping)) * weights["occupation_encoded"] +
+    (cleaned_data2["avg_cars_at home(approx)"]) * weights["cars_at_home"] 
+)
 
 ordinal_cat = ["education","occupation","member_card",
                "avg. yearly_income","store_type"]
 dic = {}
 for i in range(len(ordinal_cat)):
-    dic[ordinal_cat[i]] = cleaned_data[ordinal_cat[i]].unique()
+    dic[ordinal_cat[i]] = cleaned_data2[ordinal_cat[i]].unique()
 codes = [0,1,2,3,4,5,6,7]
 ed_map = pd.DataFrame({"education" : ["Partial High School","High School Degree","Partial College","Bachelors Degree","Graduate Degree"],
                        "encoding_values" : codes[:5]})
@@ -52,7 +112,7 @@ inc_map = pd.DataFrame({"avg. yearly_income" :['10K - 30K', '30K - 50K', '50K - 
 store_map = pd.DataFrame({"store_type":['Small Grocery', 'Mid-Size Grocery', 'Supermarket', 'Gourmet Supermarket', 'Deluxe Supermarket'],
                          "encoding_values" : codes[:5]})
 
-ed_encoded=cleaned_data.copy()
+ed_encoded=cleaned_data2.copy()
 ed_encoded[ordinal_cat[0]] = pd.Categorical(ed_encoded[ordinal_cat[0]], categories=ed_map[ordinal_cat[0]], ordered=True).codes
 occ_encoded=ed_encoded.copy()
 occ_encoded[ordinal_cat[1]] = pd.Categorical(occ_encoded[ordinal_cat[1]], categories=occ_map[ordinal_cat[1]], ordered=True).codes
@@ -212,7 +272,7 @@ with st.container(border=True):
     if "disabled1" not in st.session_state:
         st.session_state.disabled1 = False
 
-    st.checkbox("Select the box to show original data", key="disabled1")
+    st.checkbox("Basic Preprocessing", key="disabled1")
     if st.session_state.disabled1: 
         st.dataframe(train_data, width=1400, height=150) 
 
@@ -276,6 +336,50 @@ with st.container(border=True):
                         right.dataframe(cleaned_media_tp,width=1400,height=200,hide_index=True) 
                         st.dataframe(pd.DataFrame({"Changes" : ["The 'yearly income' column has no $ in categories", "Two new categories, Daily Media and Sunday media have replaced repetitive categories."]}),
                                   width=1400, height=100, hide_index=True)
+                        
+
+with st.container(border=True):
+    if "disabled6" not in st.session_state:
+        st.session_state.disabled6 = False
+
+    st.checkbox("Feature Construction", key="disabled6")
+    if st.session_state.disabled6: 
+        st.dataframe(cleaned_data, width=1400, height=150)
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled6_1" not in st.session_state:
+                st.session_state.disabled6_1 = False
+
+            st.checkbox("Create 'Profile-Strength' feature", key="disabled6_1")
+            if st.session_state.disabled6_1: 
+                st.dataframe(pd.DataFrame(weights, index=[0]),hide_index=True, use_container_width=True)
+                col1,col2,col3,col4,col5,col6 = st.columns(6)
+                with col1:
+                    st.dataframe(pd.DataFrame(education_mapping, index = [0]).T, use_container_width=True,height=200)
+                with col2:
+                    st.dataframe(pd.DataFrame(houseowner_mapping, index = [0]).T, use_container_width=True,height=200)
+                with col3:
+                    st.dataframe(pd.DataFrame(member_card_mapping, index = [0]).T, use_container_width=True,height=200)
+                with col4:
+                    st.dataframe(pd.DataFrame(income_mapping, index = [0]).T, use_container_width=True,height=200)
+                with col5:
+                    st.dataframe(pd.DataFrame(occupation_mapping, index = [0]).T, use_container_width=True,height=200)
+                with col6:
+                    st.dataframe(pd.DataFrame(car_mapping, index = [0]).T, use_container_width=True,height=200)
+
+                left, right = st.columns([0.3,0.7], vertical_alignment="center")
+                with left:    
+                    st.button("Create Feature", key="create_prof") #Created button to view description of data
+                    if st.session_state.create_prof:
+                        with st.spinner("Creating...", show_time=True):
+                            time.sleep(2)
+                        st.success("Created!!!")
+                        with right:
+                            st.dataframe(cleaned_data2.iloc[:10, 32:].style.set_properties(subset=["profile_strength"], **{'background-color': 'blue'}),
+                                    use_container_width=True,height=200, hide_index=True)
+            
+
+
             
 with st.container(border=True):
     if "disabled2" not in st.session_state:
@@ -283,7 +387,7 @@ with st.container(border=True):
 
     st.checkbox("Encoding the non-encoded ORDINAL categorical variables", key="disabled2")
     if st.session_state.disabled2: 
-        st.dataframe(cleaned_data, width=1400, height=150) 
+        st.dataframe(cleaned_data2, width=1400, height=150) 
 
         with st.container(border=True): ### Extract ordinal
             if "disabled2_1" not in st.session_state:
@@ -766,3 +870,11 @@ with st.container(border=True):
                         fig_without_out = px.box(cost_outlier["store_cost(in millions)"], orientation='h')
                         st.plotly_chart(fig_without_out,key="cost_without_outliers")
         
+
+with st.container(border=True):
+    if "disabled5" not in st.session_state:
+        st.session_state.disabled5 = False
+
+    st.checkbox("Scaling Data", key="disabled5")
+    if st.session_state.disabled5: 
+        st.dataframe(cost_outlier, width=1400, height=150)
