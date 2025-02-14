@@ -61,7 +61,7 @@ with st.container(border=True):
 
 #page tabs
 with st.container():
-    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Train", "Prediction"],
+    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Preprocess", "Prediction"],
                                 icons=['house', "graph-up-arrow","cloud-upload","signal"],menu_icon="cast",
                                 default_index=1,orientation="horizontal",styles={"nav-link":
                                                                                   {"text-align": "left","--hover-color": "#eee",}
@@ -69,8 +69,8 @@ with st.container():
                                                                                   {"background-color": "green"}})
     if selected == "Playground":
         st.switch_page(r"app.py")
-    if selected == "Train":
-        st.switch_page(r"pages/train.py")
+    if selected == "Preprocess":
+        st.switch_page(r"pages/preprocess.py")
     if selected == "Prediction":
         st.switch_page(r"pages/prediction.py")
 

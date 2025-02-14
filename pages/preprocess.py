@@ -12,8 +12,9 @@ import plotly.figure_factory as ff
 from streamlit_extras.switch_page_button import switch_page
 from streamlit_option_menu import option_menu
 import time
+import category_encoders as cat_encoder
 
-st.set_page_config(page_title = "Train",page_icon="🦈",layout="wide",initial_sidebar_state="collapsed")
+st.set_page_config(page_title = "Preprocess",page_icon="🦈",layout="wide",initial_sidebar_state="collapsed")
 
 # Load the dataset
 costs_data = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
@@ -70,6 +71,8 @@ for i in range(len(nominal_cat)):
     dic_2[nominal_cat[i]] = store_encoded[nominal_cat[i]].unique()
 
 
+
+
 #float-type features
 float_features = costs_data.select_dtypes(exclude="object").columns
 float_categories = costs_data[float_features].nunique()
@@ -105,7 +108,7 @@ with st.container(border=True):
     # left.subheader("Detailed EDA on Customer Acquistion Costs (FOOD-MART)")
 
 with st.container():
-    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Train", "Prediction"],
+    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Preprocess", "Prediction"],
                                 icons=['house', "graph-up-arrow","cloud-upload","signal"],menu_icon="cast",
                                 default_index=2,orientation="horizontal",styles={"nav-link":
                                                                                   {"text-align": "left","--hover-color": "#eee",}
@@ -369,9 +372,24 @@ with st.container(border=True):
                 col6.dataframe(pd.DataFrame({list(dic_2.keys())[11] : list(dic_2.values())[11]}), width=1400, height=150, hide_index=True) 
                 col6.dataframe(pd.DataFrame({'No. of categories':[len(list(dic_2.values())[11])]}),hide_index=True, use_container_width=True)
                 
-                
-                    
-                
+                            
+        with st.container(border=True): ### Extract ordinal
+            if "disabled3_2" not in st.session_state:
+                st.session_state.disabled3_2 = False
+
+            st.checkbox("Encode the 'food_category' column !", key="disabled3_2")
+            if st.session_state.disabled3_2:
+                left, right = st.columns(2)
+                with left:
+                    st.dataframe(ed_map, use_container_width=True, hide_index=True)
+                    st.dataframe(pd.DataFrame({"Inference" : ["The 'education' column has 5 categories", "The order of categories are preserved as 'partial high school' is mapped with value 0 while 'Graduate degree' with value 4"]}),
+                                   height=100, hide_index=True, use_container_width=True)
+                with right:
+                    st.button("Encode", key="clean_col", use_container_width=True) #Created button to view description of data
+                    if st.session_state.clean_col:
+                        with st.spinner("Encoding...", show_time=True):
+                            time.sleep(2)
+                        st.success("Encoded!")
                     
                 
                     

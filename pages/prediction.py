@@ -55,7 +55,7 @@ with st.container(border=True):
     # left.subheader("Detailed EDA on Customer Acquistion Costs (FOOD-MART)")
 
 with st.container():
-    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Train", "Prediction"],
+    selected = option_menu(menu_title=None,options=["Playground", "EDA", "Preprocess", "Prediction"],
                                 icons=['house', "graph-up-arrow","cloud-upload","signal"],menu_icon="cast",
                                 default_index=3,orientation="horizontal",styles={"nav-link":
                                                                                   {"text-align": "left","--hover-color": "#eee",}
@@ -65,7 +65,7 @@ with st.container():
         # # st.switch_page("main.py")
     if selected == "EDA":
         st.switch_page(r"pages/eda.py")
-    if selected == "Train":
-        st.switch_page(r"pages/train.py")
+    if selected == "Preprocess":
+        st.switch_page(r"pages/preprocess.py")
     if selected == "Playground":
         st.switch_page(r"app.py")
