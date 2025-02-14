@@ -29,3 +29,4 @@ plotly-geo
 geopandas
 pyshp
 shapely
+category-encoders
