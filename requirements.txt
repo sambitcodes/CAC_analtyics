@@ -30,3 +30,4 @@ geopandas
 pyshp
 shapely
 category-encoders
+skfeature-chappers
