@@ -6,6 +6,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import MinMaxScaler
 from scipy.stats import skew, kurtosis
 import plotly.express as px
 import plotly.figure_factory as ff
@@ -13,6 +14,7 @@ from streamlit_extras.switch_page_button import switch_page
 from streamlit_option_menu import option_menu
 import time
 import category_encoders as cat_encoder
+import plotly.graph_objects as go
 
 st.set_page_config(page_title = "Preprocess",page_icon="🦈",layout="wide",initial_sidebar_state="collapsed")
 
@@ -20,6 +22,7 @@ st.set_page_config(page_title = "Preprocess",page_icon="🦈",layout="wide",init
 costs_data = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
 train = pd.read_csv(r'cac_dataset/customer_acquisition_costs.csv')
 train_data = train.drop(["cost"],axis=1)
+train_label = train["cost"]
 repeat_data = train_data.drop(["avg_cars_at home(approx).1"], axis=1) # removed reptitive
 year_inc = pd.DataFrame({'avg. yearly_income':repeat_data['avg. yearly_income'].unique()})
 cleaned_year_inc =  year_inc['avg. yearly_income'].str.replace(r'\$', '', regex=True).unique()
@@ -217,6 +220,33 @@ dic_cost = get_stats(media_encoded, "store_cost(in millions)")
 cost_outlier = sales_outlier.copy()
 cost_outlier["store_cost(in millions)"] = np.where(cost_outlier["store_cost(in millions)"] > dic_cost["Upper Fence"][0], dic_cost["Upper Fence"][0], (np.where(cost_outlier["store_cost(in millions)"] < dic_cost["Lower Fence"][0], dic_cost["Lower Fence"][0], cost_outlier["store_cost(in millions)"])))
 dic_cost2 = get_stats(cost_outlier,"store_cost(in millions)")
+
+rf_scores = [1.61518389e-05, 1.61169752e-05, 1.90269168e-05, 9.78641594e-06,
+       1.49329948e-05, 1.41289610e-05, 2.23053058e-05, 1.14246800e-05,
+       1.63264502e-05, 1.25248454e-05, 1.58203876e-05, 1.21190232e-05,
+       7.86915266e-06, 1.74325757e-04, 1.72793972e-04, 5.99319317e-05,
+       5.15327092e-02, 5.71019507e-02, 9.57932869e-02, 6.20936834e-02,
+       8.13183535e-02, 7.83320446e-02, 1.18962124e-02, 1.59738279e-02,
+       4.62628977e-05, 4.91535729e-05, 6.95766515e-05, 7.71661905e-05,
+       5.02536715e-04, 3.04344704e-04, 1.84812476e-04, 2.12220851e-04,
+       7.51852966e-05, 5.61096228e-05, 4.40996724e-04, 2.51446309e-04,
+       2.29671664e-04, 1.07370775e-05, 8.82248443e-06, 8.37692505e-06,
+       1.36973063e-05, 1.41221922e-05, 1.48053028e-05, 1.71762993e-05,
+       2.03838749e-04, 1.68543893e-04, 1.40994807e-04, 1.54569845e-05,
+       2.41838824e-05, 1.45988168e-04, 4.47688860e-02, 8.42902571e-04,
+       1.20385639e-02, 3.16925675e-02, 1.52177129e-02, 1.53439129e-02,
+       7.30073107e-03, 8.55208266e-03, 1.45887360e-02, 3.79220078e-02,
+       3.51404560e-02, 3.61280230e-02, 4.59617951e-02, 4.67267978e-02,
+       1.02706588e-02, 4.53887413e-03, 2.54027057e-03, 2.91438491e-03,
+       1.44318128e-02, 1.87468573e-02, 6.66589349e-02, 4.93025956e-02,
+       1.96347934e-02, 8.11760407e-04]
+
+rforest_df = pd.DataFrame({"features": cost_outlier.columns,"imp_values":list(rf_scores)}).sort_values(by = ['imp_values'], ascending=False)
+selected_feature = list(rforest_df[rforest_df["imp_values"]>0.001]["features"])
+important_data = cost_outlier[selected_feature]
+scaler = MinMaxScaler()
+scaled_full_data = pd.DataFrame(scaler.fit_transform(cost_outlier), index=cost_outlier.index, columns=cost_outlier.columns)
+scaled_important_data = pd.DataFrame(scaler.fit_transform(important_data), index=important_data.index, columns=important_data.columns)
 
 
 #float-type features
@@ -875,6 +905,69 @@ with st.container(border=True):
     if "disabled5" not in st.session_state:
         st.session_state.disabled5 = False
 
-    st.checkbox("Scaling Data", key="disabled5")
+    st.checkbox("Feature Selection", key="disabled5")
     if st.session_state.disabled5: 
         st.dataframe(cost_outlier, width=1400, height=150)
+
+        with st.container(border=True): ### Extract ordinal
+            if "disabled5_1" not in st.session_state:
+                st.session_state.disabled5_1 = False
+
+            st.checkbox("Check correlation of features", key="disabled5_1")
+            if st.session_state.disabled5_1:
+                feature_list = cost_outlier.columns
+                option_cat = st.selectbox("Select a feature to check_correlation",feature_list,key="feat")
+
+                corr_df = cost_outlier.corr()[[option_cat]].T
+                fig = px.imshow(corr_df,labels=dict(x="Features", y="Selected Feature", color="Correlation"), aspect="auto")
+                st.plotly_chart(fig)
+        
+        with st.container(border=True): ### Extract ordinal
+            if "disabled5_2" not in st.session_state:
+                st.session_state.disabled5_2 = False
+        
+            st.checkbox("Select important features", key="disabled5_2")
+            if st.session_state.disabled5_2:
+
+                selected_feature = list(rforest_df[rforest_df["imp_values"]>0.001]["features"])
+                st.dataframe(cost_outlier.iloc[:10,].style.set_properties(subset=selected_feature, **{'background-color': 'blue'}), width=1400, height=200, hide_index=True)
+                fig = px.bar(rforest_df, x = rforest_df.columns[0], y=rforest_df.columns[1])
+                st.plotly_chart(fig)
+                st.button("Select Features", key="rem_cost", use_container_width=True) #Created button to view description of data
+                if st.session_state.rem_cost:
+                    with st.spinner("Selecting...", show_time=True):
+                        time.sleep(2)
+                    st.success("Selected!")
+                    st.dataframe(cost_outlier[selected_feature], use_container_width=True, height=200,hide_index=True)
+
+
+                
+                
+with st.container(border=True):
+    if "disabled7" not in st.session_state:
+        st.session_state.disabled7 = False
+
+    st.checkbox("Data Scaling", key="disabled7")
+    if st.session_state.disabled7: 
+        data_list = ["Full data","Feature Selected Data"]
+        option_cat = st.selectbox("Select data",data_list,key="cat_select")
+
+        if option_cat == data_list[0]:
+            st.dataframe(cost_outlier, width=1400, height=150, hide_index=True)
+            st.button("Scale Data", key="full_data")
+            if st.session_state.full_data:
+                with st.spinner("Scaling...", show_time=True):
+                    time.sleep(2)
+                st.success("Scaled!")
+                st.dataframe(scaled_full_data, use_container_width=True, height=150,hide_index=True)
+
+        else:
+            st.dataframe(important_data, width=1400, height=150, hide_index=True)
+            st.button("Scale Data", key="part_data")
+            if st.session_state.part_data:
+                with st.spinner("Scaling...", show_time=True):
+                    time.sleep(2)
+                st.success("Scaled!")
+                st.dataframe(scaled_important_data, use_container_width=True, height=150,hide_index=True)
+                
+
